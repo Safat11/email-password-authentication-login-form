@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from 'firebase/auth';
 import app from '../../firebase/firebase.config';
+import { Link } from 'react-router-dom';
 
 const auth = getAuth(app);
 
@@ -40,11 +41,21 @@ const Register = () => {
             setError('');
             event.target.reset();
             setSuccess('User has been created successfully');
+            sendVerificationEmail(result.user);
         })
         .catch(error => {
             console.error(error.message);
             setError(error.message);
            
+        })
+
+    }
+    
+    const sendVerificationEmail = (user) =>{
+        sendEmailVerification(user)
+        .then(result =>{
+            console.log(result);
+            alert('Please verify your email address')
         })
 
     }
@@ -69,6 +80,8 @@ const Register = () => {
             <br />
             <input className='btn btn-primary' type="submit" value="Register" />
             </form>
+            <br />
+            <p><small>Already have an account? Please <Link to='/login'>Login</Link></small></p>
             <p className='text-danger'>{error}</p>
             <p className='text-primary'>{success}</p>
         </div>

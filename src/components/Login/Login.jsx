@@ -1,4 +1,9 @@
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
+import app from '../../firebase/firebase.config';
+import { Link } from 'react-router-dom';
+
+const auth = getAuth(app);
 
 const Login = () => {
     const [error, setError] = useState('');
@@ -26,12 +31,26 @@ const Login = () => {
             return;
         }
 
-        setSuccess('Login successful!');
+        // setSuccess('Login successful!');
+
+        signInWithEmailAndPassword(auth, email, password)
+
+        .then(result =>{
+            const loggedUser = result.user;
+            console.log(loggedUser);
+            setSuccess('User Login Successful!');
+            setError('');
+
+        })
+        .catch(error =>{
+            setError(error.message);
+        })
     };
 
     return (
         <div>
-            <h3 className="w-25 mx-auto text-center mt-4">Please Login</h3>
+            {/* <h3 className="w-25 mx-auto text-center mt-4">Please Login</h3> */}
+            
             <div className="container d-flex justify-content-center align-items-center vh-100">
                 <div className="card p-4 shadow-lg" style={{ width: '24rem' }}>
                     <h3 className="text-center mb-4">Login</h3>
@@ -65,6 +84,9 @@ const Login = () => {
                     <div className="text-center mt-3">
                         <a href="#" className="text-decoration-none">Forgot Password?</a>
                     </div>
+                    <br />
+                    <p><small>New to this website? Please <Link to='/register'>Register</Link></small></p>
+
                     <p className="text-danger mt-3" aria-live="polite">{error}</p>
                     <p className="text-success mt-3" aria-live="polite">{success}</p>
                 </div>
