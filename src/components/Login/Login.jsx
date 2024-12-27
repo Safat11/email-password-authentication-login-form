@@ -1,5 +1,5 @@
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import React, { useState } from 'react';
+import { getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useRef, useState } from 'react';
 import app from '../../firebase/firebase.config';
 import { Link } from 'react-router-dom';
 
@@ -8,6 +8,7 @@ const auth = getAuth(app);
 const Login = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const emailRef = useRef();
 
     const handleLogin = (event) => {
 
@@ -38,6 +39,9 @@ const Login = () => {
         .then(result =>{
             const loggedUser = result.user;
             console.log(loggedUser);
+            if(!loggedUser.emailVerified){
+                alert('Email is not verified');
+            }
             setSuccess('User Login Successful!');
             setError('');
 
@@ -47,10 +51,23 @@ const Login = () => {
         })
     };
 
+    const handleResetPassword = event =>{
+        const email = emailRef.current.value;
+        alert('Please provide your email address to reset password');
+        return;
+    }
+    sendPasswordResetEmail(auth, email)
+    .then(() =>{
+        alert('Please check your email')
+    })
+    .catch(error =>{
+        console.log(error);
+        setError(error.message)
+    })
     return (
         <div>
             {/* <h3 className="w-25 mx-auto text-center mt-4">Please Login</h3> */}
-            
+
             <div className="container d-flex justify-content-center align-items-center vh-100">
                 <div className="card p-4 shadow-lg" style={{ width: '24rem' }}>
                     <h3 className="text-center mb-4">Login</h3>
@@ -59,6 +76,7 @@ const Login = () => {
                             <label htmlFor="email" className="form-label">Email address</label>
                             <input
                                 type="email"
+                                ref = {emailRef}
                                 className="form-control"
                                 name="email"
                                 id="email"
@@ -84,6 +102,7 @@ const Login = () => {
                     <div className="text-center mt-3">
                         <a href="#" className="text-decoration-none">Forgot Password?</a>
                     </div>
+                    <p><small>Forget Password? Please <button onClick={handleResetPassword} className='btn btn-link'>Reset Password</button></small></p>
                     <br />
                     <p><small>New to this website? Please <Link to='/register'>Register</Link></small></p>
 
